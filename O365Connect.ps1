@@ -2,6 +2,8 @@
 Param(
 	[Parameter(Mandatory=$true,ParameterSetName='Connect')]
 		[switch]$Connect,
+	[Parameter(Mandatory=$false,ParameterSetName='Connect')]
+		[switch]$HybridSfB,
 	[Parameter(Mandatory=$true,ParameterSetName='Disconnect')]
 		[switch]$Disconnect
 )
@@ -39,11 +41,14 @@ if($connect){
 	#SfB ----connecting to hybrid
 	Write-host "Connecting to Skype for Business Online"
 	if (-not (Get-Module LyncOnlineConnector)){ Import-Module LyncOnlineConnector}
-	#Connect to Hybrid
-	Write-host "`tUsing OverrideDomain:" $fullTenantName
-	$sfboSession = New-CsOnlineSession -Credential $credential -OverrideAdminDomain $fullTenantName
-	#to connect to Non-Hybrid use the line below
-	#$sfboSession = New-CsOnlineSession -Credential $credential
+	#Connect to Hybrid if switch is used
+	if($HybridSfB){
+		Write-host "`tUsing OverrideDomain:" $fullTenantName
+		$sfboSession = New-CsOnlineSession -Credential $credential -OverrideAdminDomain $fullTenantName
+	} else {
+		#connect to Non-Hybrid if hybrid switch not present
+		$sfboSession = New-CsOnlineSession -Credential $credential
+	}
 	Import-PSSession $sfboSession
 
 	#Compliance Center
