@@ -2,13 +2,15 @@
 $users=Get-MsolUser -All | Where-Object { $_.isLicensed -eq "TRUE" }
 #setup a var to hold your output
 $CRMlicensedusers=@()
+#get all the available SKU on the tenant
+$SKUs=Get-MsolAccountSku | select accountskuid
 #loop through the users
 foreach($user in $users){
     #the Licenses.AccountSkuID is what we're interested in
     Foreach($license in $user.licenses.accountskuid){
         #look for %yourtenantname%:CRMSTANDARD
         #so for me its Anexinet:CRMSTANDARD
-        if ($license -eq "Anexinet:CRMIUR") {
+        if ($license -eq "Anexinet:CRMSTANDARD") {
             #add the License value to the object, this gives us a single value
             $user | Add-Member -Type NoteProperty -Name License -Value $license
             #push the object into the output
